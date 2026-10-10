@@ -1,0 +1,9 @@
+# Normalise line endings in the repository
+* text=auto
+*.bat text eol=crlf
+gradlew text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jar binary

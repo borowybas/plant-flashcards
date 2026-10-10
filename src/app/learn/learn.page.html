@@ -1,0 +1,89 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>{{ t('learn.title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-list-header>
+      <ion-label>{{ t('learn.mode') }}</ion-label>
+    </ion-list-header>
+    <ion-radio-group [value]="mode()" (ionChange)="mode.set($any($event).detail.value)">
+      <ion-item>
+        <ion-radio value="name" justify="space-between">
+          <ion-label class="ion-text-wrap">
+            <h2>{{ t('learn.mode.name') }}</h2>
+            <p>{{ t('learn.mode.nameDesc') }}</p>
+          </ion-label>
+        </ion-radio>
+      </ion-item>
+      <ion-item>
+        <ion-radio value="image" justify="space-between">
+          <ion-label class="ion-text-wrap">
+            <h2>{{ t('learn.mode.image') }}</h2>
+            <p>{{ t('learn.mode.imageDesc') }}</p>
+          </ion-label>
+        </ion-radio>
+      </ion-item>
+      <ion-item>
+        <ion-radio value="family" justify="space-between">
+          <ion-label class="ion-text-wrap">
+            <h2>{{ t('learn.mode.family') }}</h2>
+            <p>{{ t('learn.mode.familyDesc') }}</p>
+          </ion-label>
+        </ion-radio>
+      </ion-item>
+    </ion-radio-group>
+  </ion-list>
+
+  @if (mode() === 'name') {
+    <ion-list>
+      <ion-list-header>
+        <ion-label>{{ t('learn.front') }}</ion-label>
+      </ion-list-header>
+      <ion-item lines="none">
+        <ion-segment [value]="front()" (ionChange)="front.set($any($event).detail.value)">
+          <ion-segment-button value="pl"><ion-label>{{ t('learn.front.pl') }}</ion-label></ion-segment-button>
+          <ion-segment-button value="la"><ion-label>{{ t('learn.front.la') }}</ion-label></ion-segment-button>
+        </ion-segment>
+      </ion-item>
+    </ion-list>
+  }
+
+  @if (store.folders().length) {
+    <ion-list>
+      <ion-list-header>
+        <ion-label>{{ t('learn.scope') }}</ion-label>
+      </ion-list-header>
+      <div class="scope">
+        <app-folder-chips [(selected)]="folderIds" [allowCreate]="false"></app-folder-chips>
+        <p class="hint-left">{{ activeFolderIds().length ? t('learn.scope.some') : t('learn.scope.all') }}</p>
+      </div>
+    </ion-list>
+  }
+
+  <ion-list>
+    <ion-item>
+      <ion-toggle [checked]="shuffle()" (ionChange)="shuffle.set($any($event).detail.checked)">
+        {{ t('learn.shuffle') }}
+      </ion-toggle>
+    </ion-item>
+  </ion-list>
+
+  <div class="ion-padding">
+    <ion-button expand="block" size="large" [disabled]="available() === 0" (click)="start()">
+      <ion-icon slot="start" name="play"></ion-icon>
+      {{ t('learn.start', { cards: i18n.cards(available()) }) }}
+    </ion-button>
+    @if (available() === 0) {
+      <p class="hint">
+        @switch (mode()) {
+          @case ('image') { {{ t('learn.none.image') }} }
+          @case ('family') { {{ t('learn.none.family') }} }
+          @default { {{ t('learn.none.name') }} }
+        }
+      </p>
+    }
+  </div>
+</ion-content>

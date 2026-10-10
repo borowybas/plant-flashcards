@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>{{ t('settings.title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-list-header>
+      <ion-label>{{ t('settings.language') }}</ion-label>
+    </ion-list-header>
+    <ion-item lines="none">
+      <ion-segment [value]="i18n.lang()" (ionChange)="setLang($any($event).detail.value)">
+        <ion-segment-button value="pl"><ion-label>Polski</ion-label></ion-segment-button>
+        <ion-segment-button value="en"><ion-label>English</ion-label></ion-segment-button>
+      </ion-segment>
+    </ion-item>
+    <p class="hint">{{ t('settings.languageHint') }}</p>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header>
+      <ion-label>{{ t('settings.backup') }}</ion-label>
+    </ion-list-header>
+    <p class="hint">{{ t('settings.backupHint') }}</p>
+    <ion-item button [disabled]="busy() !== null" (click)="export()">
+      <ion-icon slot="start" name="cloud-upload-outline" color="primary"></ion-icon>
+      <ion-label>
+        <h2>{{ t('settings.export') }}</h2>
+        <p>
+          {{ t('settings.exportDesc', { cards: i18n.cards(store.cards().length), folders: i18n.folders(store.folders().length) }) }}
+        </p>
+      </ion-label>
+      @if (busy() === 'export') {
+        <ion-spinner slot="end"></ion-spinner>
+      }
+    </ion-item>
+    <ion-item button [disabled]="busy() !== null" (click)="fileInput.click()">
+      <ion-icon slot="start" name="cloud-download-outline" color="primary"></ion-icon>
+      <ion-label>
+        <h2>{{ t('settings.import') }}</h2>
+        <p>{{ t('settings.importDesc') }}</p>
+      </ion-label>
+      @if (busy() === 'import') {
+        <ion-spinner slot="end"></ion-spinner>
+      }
+    </ion-item>
+    <input #fileInput type="file" hidden (change)="import($event)" />
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header>
+      <ion-label>{{ t('settings.support') }}</ion-label>
+    </ion-list-header>
+    <ion-item button detail="true" (click)="openCoffee()">
+      <ion-icon slot="start" name="cafe-outline" color="warning"></ion-icon>
+      <ion-label>
+        <h2>{{ t('settings.coffee') }}</h2>
+        <p class="ion-text-wrap">{{ t('settings.coffeeDesc') }}</p>
+      </ion-label>
+      <ion-note slot="end">buycoffee.to</ion-note>
+    </ion-item>
+  </ion-list>
+</ion-content>

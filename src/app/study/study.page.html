@@ -1,0 +1,103 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/learn" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      @if (!finished()) {
+        {{ t('study.left', { n: queue().length, total: total() }) }}
+      } @else {
+        {{ t('study.end') }}
+      }
+    </ion-title>
+  </ion-toolbar>
+  <ion-progress-bar [value]="progress()"></ion-progress-bar>
+</ion-header>
+
+<ion-content>
+  <div class="layout">
+    @if (current(); as card) {
+      @for (k of [turn()]; track k) {
+        <div class="scene" (click)="flip()">
+          <div class="card" [class.flipped]="flipped()">
+            <!-- FRONT -->
+            <div class="face front">
+              <ng-container *ngTemplateOutlet="photo"></ng-container>
+              <div class="text">
+                @for (q of question(); track $index) {
+                  <div class="name" [class.latin]="q.latin">{{ q.text }}</div>
+                }
+                @if (question().length !== 1) {
+                  <div class="tap-hint">{{ prompt() }}</div>
+                }
+                <div class="tap-hint small">{{ t('study.tapToFlip') }}</div>
+              </div>
+            </div>
+
+            <!-- BACK -->
+            <div class="face back">
+              <ng-container *ngTemplateOutlet="photo"></ng-container>
+              <div class="text">
+                @for (q of question(); track $index) {
+                  <div class="asked" [class.latin]="q.latin">{{ q.text }}</div>
+                }
+                @for (a of answers(); track a.label) {
+                  <div class="answer">
+                    <div class="label">{{ a.label }}</div>
+                    <div class="name" [class.latin]="a.latin">{{ a.text }}</div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="actions" [class.visible]="flipped()">
+        <ion-button color="danger" fill="outline" size="large" (click)="answer(false)">
+          <ion-icon slot="start" name="close"></ion-icon>
+          {{ t('study.dontKnow') }}
+        </ion-button>
+        <ion-button color="success" size="large" (click)="answer(true)">
+          <ion-icon slot="start" name="checkmark"></ion-icon>
+          {{ t('study.know') }}
+        </ion-button>
+      </div>
+    } @else if (finished()) {
+      <div class="summary">
+        <ion-icon name="trophy-outline"></ion-icon>
+        <h2>{{ t('study.done') }}</h2>
+        <p>
+          {{ t('study.firstTry') }} <strong>{{ total() - missed().length }} / {{ total() }}</strong>
+        </p>
+        @if (missed().length) {
+          <p class="missed-title">{{ t('study.toRepeat') }}</p>
+          <ul>
+            @for (c of missed(); track c.id) {
+              <li>{{ c.polish }} - <i>{{ c.latin }}</i></li>
+            }
+          </ul>
+          <ion-button expand="block" (click)="repeatMissed()">
+            <ion-icon slot="start" name="repeat"></ion-icon>
+            {{ t('study.repeatMissed', { n: missed().length }) }}
+          </ion-button>
+        }
+        <ion-button expand="block" fill="outline" (click)="restart()">
+          <ion-icon slot="start" name="refresh"></ion-icon>
+          {{ t('study.restart') }}
+        </ion-button>
+        <ion-button expand="block" fill="clear" (click)="exit()">{{ t('study.finish') }}</ion-button>
+      </div>
+    }
+  </div>
+</ion-content>
+
+<ng-template #photo>
+  <div class="photo">
+    @if (image(); as src) {
+      <img [src]="src" alt="" />
+    } @else {
+      <ion-icon name="image-outline"></ion-icon>
+    }
+  </div>
+</ng-template>

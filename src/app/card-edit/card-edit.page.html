@@ -1,0 +1,75 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/cards" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ id() ? t('edit.titleEdit') : t('edit.titleNew') }}</ion-title>
+    @if (id()) {
+      <ion-buttons slot="end">
+        <ion-button (click)="remove()" [attr.aria-label]="t('edit.delete')">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    }
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list lines="full">
+    <ion-item>
+      <ion-input
+        [label]="t('common.polishName')"
+        labelPlacement="stacked"
+        [placeholder]="t('edit.polishPlaceholder')"
+        autocapitalize="sentences"
+        [(ngModel)]="polish"
+      ></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input
+        class="latin"
+        [label]="t('common.latinName')"
+        labelPlacement="stacked"
+        [placeholder]="t('edit.latinPlaceholder')"
+        autocapitalize="sentences"
+        [(ngModel)]="latin"
+      ></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input
+        [label]="t('common.family')"
+        labelPlacement="stacked"
+        [placeholder]="t('edit.familyPlaceholder')"
+        autocapitalize="sentences"
+        [(ngModel)]="family"
+      ></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <h3>{{ t('edit.folders') }}</h3>
+  <app-folder-chips [(selected)]="folderIds"></app-folder-chips>
+
+  <h3>{{ t('edit.photos') }}</h3>
+  <div class="images">
+    @for (src of images(); track $index) {
+      <div class="image">
+        <img [src]="src" alt="" />
+        <button type="button" (click)="removeImage($index)" [attr.aria-label]="t('common.removePhoto')">
+          <ion-icon name="close-circle"></ion-icon>
+        </button>
+      </div>
+    }
+    <label class="add-image">
+      @if (loadingImages()) {
+        <ion-spinner></ion-spinner>
+      } @else {
+        <ion-icon name="camera"></ion-icon>
+        <span>{{ t('edit.addPhoto') }}</span>
+      }
+      <input type="file" accept="image/*" multiple hidden (change)="addImages($event)" />
+    </label>
+  </div>
+  <p class="hint">{{ t('edit.photosHint') }}</p>
+
+  <ion-button expand="block" class="save" (click)="save()">{{ t('common.save') }}</ion-button>
+</ion-content>

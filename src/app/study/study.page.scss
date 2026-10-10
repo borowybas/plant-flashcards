@@ -1,0 +1,149 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+  gap: 16px;
+}
+
+.scene {
+  flex: 1;
+  min-height: 0;
+  perspective: 1400px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.45s ease;
+
+  &.flipped {
+    transform: rotateY(180deg);
+  }
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--ion-background-color-step-100, var(--ion-color-step-100, #f2f2f2));
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+}
+
+.back {
+  transform: rotateY(180deg);
+}
+
+.photo {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: #111;
+  color: var(--ion-color-medium);
+
+  // Absolutely positioned so a tall (portrait) photo can never grow the box and push over the text.
+  img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  ion-icon {
+    font-size: 72px;
+  }
+}
+
+.text {
+  flex: none;
+  padding: 16px 20px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.name {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.latin {
+  font-style: italic;
+}
+
+.answer .label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ion-color-medium);
+}
+
+.asked {
+  font-size: 15px;
+  color: var(--ion-color-medium);
+}
+
+.back .name {
+  color: var(--ion-color-primary);
+}
+
+.tap-hint {
+  font-size: 18px;
+  color: var(--ion-color-medium);
+
+  &.small {
+    font-size: 13px;
+  }
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  visibility: hidden; // keep space reserved so the card doesn't jump
+
+  &.visible {
+    visibility: visible;
+  }
+
+  ion-button {
+    margin: 0;
+  }
+}
+
+.summary {
+  margin: auto 0;
+  text-align: center;
+
+  > ion-icon {
+    font-size: 72px;
+    color: var(--ion-color-warning);
+  }
+
+  ul {
+    text-align: left;
+    max-height: 30vh;
+    overflow-y: auto;
+  }
+
+  .missed-title {
+    text-align: left;
+    font-weight: 600;
+    margin-bottom: 0;
+  }
+}

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Rośliny - fiszki</string>
+    <string name="title_activity_main">Rośliny - fiszki</string>
+    <string name="package_name">pl.plantflashcards</string>
+    <string name="custom_url_scheme">pl.plantflashcards</string>
+</resources>

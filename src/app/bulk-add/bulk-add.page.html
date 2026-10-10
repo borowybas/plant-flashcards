@@ -1,0 +1,71 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/cards" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ t('bulk.title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <label class="picker">
+    @if (loading()) {
+      <ion-spinner></ion-spinner>
+    } @else {
+      <ion-icon name="images-outline"></ion-icon>
+      <span>{{ t('bulk.pick') }}</span>
+    }
+    <input type="file" accept="image/*" multiple hidden (change)="pick($event)" />
+  </label>
+  <h3>{{ t('bulk.folders') }}</h3>
+  <app-folder-chips [(selected)]="folderIds"></app-folder-chips>
+
+  <p class="hint">{{ t('bulk.hint') }}</p>
+
+  @for (draft of drafts(); track draft.key) {
+    <ion-card>
+      <div class="draft-image">
+        <img [src]="draft.image" alt="" />
+        <button type="button" (click)="remove(draft)" [attr.aria-label]="t('common.removePhoto')">
+          <ion-icon name="close-circle"></ion-icon>
+        </button>
+      </div>
+      <ion-card-content>
+        <ion-input
+          [label]="t('common.polishName')"
+          labelPlacement="floating"
+          fill="outline"
+          autocapitalize="sentences"
+          [(ngModel)]="draft.polish"
+          (ionInput)="edits.set(edits() + 1)"
+        ></ion-input>
+        <ion-input
+          class="latin"
+          [label]="t('common.latinName')"
+          labelPlacement="floating"
+          fill="outline"
+          autocapitalize="sentences"
+          [(ngModel)]="draft.latin"
+          (ionInput)="edits.set(edits() + 1)"
+        ></ion-input>
+        <ion-input
+          [label]="t('bulk.familyOptional')"
+          labelPlacement="floating"
+          fill="outline"
+          autocapitalize="sentences"
+          [(ngModel)]="draft.family"
+        ></ion-input>
+      </ion-card-content>
+    </ion-card>
+  }
+</ion-content>
+
+@if (drafts().length) {
+  <ion-footer>
+    <ion-toolbar>
+      <ion-button expand="block" class="ion-padding-horizontal" [disabled]="completeCount() === 0" (click)="saveAll()">
+        {{ t('bulk.saveN', { done: completeCount(), total: drafts().length }) }}
+      </ion-button>
+    </ion-toolbar>
+  </ion-footer>
+}

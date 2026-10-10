@@ -1,0 +1,7 @@
+{
+  "name": "plant-flashcards",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

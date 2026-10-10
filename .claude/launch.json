@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "plant-flashcards",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "-p", "node@24.15.0", "--", "node", "node_modules/@angular/cli/bin/ng.js", "serve", "--port", "4200"],
+      "port": 4200
+    }
+  ]
+}

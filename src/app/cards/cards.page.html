@@ -1,0 +1,92 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>{{ folder()?.name ?? t('cards.title') }} ({{ filtered().length }})</ion-title>
+    <ion-buttons slot="end">
+      @if (folder()) {
+        <ion-button (click)="folderActions()" [attr.aria-label]="t('cards.folderOptions')">
+          <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+        </ion-button>
+      }
+      <ion-button routerLink="/cards/bulk" [queryParams]="{ folder: folderId() || null }" [attr.aria-label]="t('cards.bulkAria')">
+        <ion-icon slot="start" name="images-outline"></ion-icon>
+        {{ t('cards.bulk') }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      [placeholder]="t('cards.search')"
+      [value]="query()"
+      (ionInput)="query.set($any($event).detail.value ?? '')"
+    ></ion-searchbar>
+    <div class="folders">
+      <ion-chip [outline]="folderId() !== ''" [color]="folderId() === '' ? 'primary' : 'medium'" (click)="folderId.set('')">
+        <ion-label>{{ t('cards.all') }} ({{ store.cards().length }})</ion-label>
+      </ion-chip>
+      @for (f of store.folders(); track f.id) {
+        <ion-chip [outline]="folderId() !== f.id" [color]="folderId() === f.id ? 'primary' : 'medium'" (click)="folderId.set(f.id)">
+          <ion-icon name="folder-outline"></ion-icon>
+          <ion-label>{{ f.name }} ({{ folderCounts().get(f.id) ?? 0 }})</ion-label>
+        </ion-chip>
+      }
+      <ion-chip outline color="primary" (click)="newFolder()" [attr.aria-label]="t('cards.newFolder')">
+        <ion-icon name="add"></ion-icon>
+        <ion-label>{{ t('cards.folderChip') }}</ion-label>
+      </ion-chip>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (store.loaded() && store.cards().length === 0) {
+    <div class="empty">
+      <ion-icon name="image-outline"></ion-icon>
+      <h2>{{ t('cards.empty.title') }}</h2>
+      <p>{{ t('cards.empty.text') }}</p>
+    </div>
+  } @else if (filtered().length === 0 && query()) {
+    <div class="empty"><p>{{ t('cards.notFound', { q: query() }) }}</p></div>
+  } @else if (filtered().length === 0 && folder()) {
+    <div class="empty">
+      <ion-icon name="folder-outline"></ion-icon>
+      <p>{{ t('cards.folderEmpty') }}</p>
+    </div>
+  }
+
+  <ion-list>
+    @for (card of filtered(); track card.id) {
+      <ion-item-sliding #sliding>
+        <ion-item [routerLink]="['/cards', card.id]" detail="true">
+          <ion-thumbnail slot="start">
+            @if (card.images[0]; as src) {
+              <img [src]="src" alt="" />
+            } @else {
+              <div class="no-image"><ion-icon name="image-outline"></ion-icon></div>
+            }
+          </ion-thumbnail>
+          <ion-label>
+            <h2>{{ card.polish }}</h2>
+            <p class="latin">{{ card.latin }}</p>
+            @if (card.family) {
+              <p class="family">{{ card.family }}</p>
+            }
+          </ion-label>
+          @if (card.images.length > 1) {
+            <ion-badge slot="end" color="medium">{{ t('cards.photos', { n: card.images.length }) }}</ion-badge>
+          }
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="confirmRemove(card, sliding)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    }
+  </ion-list>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button routerLink="/cards/new" [queryParams]="{ folder: folderId() || null }" [attr.aria-label]="t('cards.add')">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
