@@ -2,7 +2,7 @@
   <img src="assets/logo.png" alt="App icon" width="120" />
 </p>
 
-<h1 align="center">Rośliny - fiszki</h1>
+<h1 align="center">Plant flashcards</h1>
 
 <p align="center">
   Offline flashcards for learning plants: Polish name, Latin name, family and photos.<br />
@@ -20,10 +20,10 @@
   opens a checklist for adding or removing many existing cards at once.
 - **Three study modes** with flip cards:
 
-  | Mode                      | Front                            | Back                  |
-  | ------------------------- | -------------------------------- | --------------------- |
-  | Name + photo → other name | photo + Polish **or** Latin name | the other name        |
-  | Photo → both names        | photo                            | Polish and Latin name |
+  | Mode                      | Front                            | Back                    |
+  | ------------------------- | -------------------------------- | ----------------------- |
+  | Name + photo → other name | photo + Polish **or** Latin name | the other name          |
+  | Photo → both names        | photo                            | Polish and Latin name   |
   | Both names → family       | Polish and Latin name            | Polish and Latin family |
 
   Tap to flip, then **swipe right** if you know it or **swipe left** if you don't (on a computer: ← / → keys, space to flip).
