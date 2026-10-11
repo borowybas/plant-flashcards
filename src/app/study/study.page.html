@@ -18,7 +18,9 @@
   <div class="layout">
     @if (current(); as card) {
       @for (k of [turn()]; track k) {
-        <div class="scene" (click)="flip()">
+        <div class="scene" appSwipeCard (swiped)="answer($event === 'right')" (click)="flip()">
+          <div class="stamp know">{{ t('study.know') }}</div>
+          <div class="stamp dont-know">{{ t('study.dontKnow') }}</div>
           <div class="card" [class.flipped]="flipped()">
             <!-- FRONT -->
             <div class="face front">
@@ -27,7 +29,7 @@
                 @for (q of question(); track $index) {
                   <div class="name" [class.latin]="q.latin">{{ q.text }}</div>
                 }
-                @if (question().length !== 1) {
+                @if (prompt()) {
                   <div class="tap-hint">{{ prompt() }}</div>
                 }
                 <div class="tap-hint small">{{ t('study.tapToFlip') }}</div>
@@ -53,15 +55,9 @@
         </div>
       }
 
-      <div class="actions" [class.visible]="flipped()">
-        <ion-button color="danger" fill="outline" size="large" (click)="answer(false)">
-          <ion-icon slot="start" name="close"></ion-icon>
-          {{ t('study.dontKnow') }}
-        </ion-button>
-        <ion-button color="success" size="large" (click)="answer(true)">
-          <ion-icon slot="start" name="checkmark"></ion-icon>
-          {{ t('study.know') }}
-        </ion-button>
+      <div class="swipe-hint">
+        <span class="dont-know"><ion-icon name="arrow-back"></ion-icon> {{ t('study.dontKnow') }}</span>
+        <span class="know">{{ t('study.know') }} <ion-icon name="arrow-forward"></ion-icon></span>
       </div>
     } @else if (finished()) {
       <div class="summary">

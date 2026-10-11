@@ -3,6 +3,9 @@
     <ion-title>{{ folder()?.name ?? t('cards.title') }} ({{ filtered().length }})</ion-title>
     <ion-buttons slot="end">
       @if (folder()) {
+        <ion-button (click)="assignCards()" [attr.aria-label]="t('assign.title')">
+          <ion-icon slot="icon-only" name="checkbox-outline"></ion-icon>
+        </ion-button>
         <ion-button (click)="folderActions()" [attr.aria-label]="t('cards.folderOptions')">
           <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
         </ion-button>
@@ -50,6 +53,10 @@
     <div class="empty">
       <ion-icon name="folder-outline"></ion-icon>
       <p>{{ t('cards.folderEmpty') }}</p>
+      <ion-button fill="outline" (click)="assignCards()">
+        <ion-icon slot="start" name="checkbox-outline"></ion-icon>
+        {{ t('assign.title') }}
+      </ion-button>
     </div>
   }
 
@@ -67,8 +74,10 @@
           <ion-label>
             <h2>{{ card.polish }}</h2>
             <p class="latin">{{ card.latin }}</p>
-            @if (card.family) {
-              <p class="family">{{ card.family }}</p>
+            @if (card.familyPl || card.familyLa) {
+              <p class="family">
+                {{ card.familyPl }}{{ card.familyPl && card.familyLa ? ' · ' : '' }}<i>{{ card.familyLa }}</i>
+              </p>
             }
           </ion-label>
           @if (card.images.length > 1) {

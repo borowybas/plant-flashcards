@@ -49,7 +49,8 @@ export class CardEditPage {
 
   polish = '';
   latin = '';
-  family = '';
+  familyPl = '';
+  familyLa = '';
   readonly images = signal<string[]>([]);
   readonly folderIds = signal<string[]>([]);
   readonly loadingImages = signal(false);
@@ -65,7 +66,8 @@ export class CardEditPage {
       this.existing = card;
       this.polish = card.polish;
       this.latin = card.latin;
-      this.family = card.family ?? '';
+      this.familyPl = card.familyPl ?? '';
+      this.familyLa = card.familyLa ?? '';
       this.images.set([...card.images]);
       this.folderIds.set([...(card.folderIds ?? [])]);
     });
@@ -107,7 +109,8 @@ export class CardEditPage {
       updatedAt: now,
       polish,
       latin,
-      family: this.family.trim(),
+      familyPl: this.familyPl.trim() || undefined,
+      familyLa: this.familyLa.trim() || undefined,
       folderIds: this.folderIds(),
       images: this.images(),
     });

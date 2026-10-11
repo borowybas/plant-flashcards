@@ -49,11 +49,19 @@
           (ionInput)="edits.set(edits() + 1)"
         ></ion-input>
         <ion-input
-          [label]="t('bulk.familyOptional')"
+          [label]="t('bulk.familyPlOptional')"
           labelPlacement="floating"
           fill="outline"
           autocapitalize="sentences"
-          [(ngModel)]="draft.family"
+          [(ngModel)]="draft.familyPl"
+        ></ion-input>
+        <ion-input
+          class="latin"
+          [label]="t('bulk.familyLaOptional')"
+          labelPlacement="floating"
+          fill="outline"
+          autocapitalize="sentences"
+          [(ngModel)]="draft.familyLa"
         ></ion-input>
       </ion-card-content>
     </ion-card>

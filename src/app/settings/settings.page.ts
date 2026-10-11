@@ -21,14 +21,15 @@ import {
 import { addIcons } from 'ionicons';
 import {
   cafeOutline,
+  colorPaletteOutline,
   cloudDownloadOutline,
   cloudUploadOutline,
 } from 'ionicons/icons';
-import { BackupService } from '../services/backup.service';
+import { APP_INFO } from '../app-info';
+import { BackupService, BackupTooLargeError, MAX_IMPORT_MB } from '../services/backup.service';
 import { CardStore } from '../services/card-store.service';
 import { I18n, Lang } from '../services/i18n.service';
-
-const COFFEE_URL = 'https://buycoffee.to/basik';
+import { THEME_PRESETS, ThemeService } from '../services/theme.service';
 
 @Component({
   selector: 'app-settings',
@@ -58,10 +59,13 @@ export class SettingsPage {
   private readonly alerts = inject(AlertController);
   private readonly toasts = inject(ToastController);
 
+  readonly info = APP_INFO;
+  readonly theme = inject(ThemeService);
+  readonly presets = THEME_PRESETS;
   readonly busy = signal<'export' | 'import' | null>(null);
 
   constructor() {
-    addIcons({ cafeOutline, cloudDownloadOutline, cloudUploadOutline });
+    addIcons({ cafeOutline, colorPaletteOutline, cloudDownloadOutline, cloudUploadOutline });
   }
 
   setLang(lang: Lang) {
@@ -96,9 +100,13 @@ export class SettingsPage {
     let backup;
     try {
       backup = await this.backup.read(file);
-    } catch {
+    } catch (e) {
       this.busy.set(null);
-      await this.toast(this.t('settings.importInvalid'), 'danger');
+      const message =
+        e instanceof BackupTooLargeError
+          ? this.t('settings.importTooLarge', { mb: MAX_IMPORT_MB })
+          : this.t('settings.importInvalid');
+      await this.toast(message, 'danger');
       return;
     }
 
@@ -129,9 +137,9 @@ export class SettingsPage {
 
   async openCoffee() {
     if (Capacitor.isNativePlatform()) {
-      await Browser.open({ url: COFFEE_URL });
+      await Browser.open({ url: APP_INFO.coffeeUrl });
     } else {
-      window.open(COFFEE_URL, '_blank', 'noopener');
+      window.open(APP_INFO.coffeeUrl, '_blank', 'noopener');
     }
   }
 

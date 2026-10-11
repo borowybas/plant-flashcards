@@ -20,6 +20,38 @@
 
   <ion-list>
     <ion-list-header>
+      <ion-label>{{ t('settings.theme') }}</ion-label>
+    </ion-list-header>
+    <div class="swatches">
+      <button
+        type="button"
+        class="swatch default"
+        [class.selected]="!theme.color()"
+        (click)="theme.set(null)"
+        [attr.aria-label]="t('settings.themeDefault')"
+      ></button>
+      @for (c of presets; track c) {
+        <button
+          type="button"
+          class="swatch"
+          [style.background]="c"
+          [class.selected]="theme.color() === c"
+          (click)="theme.set(c)"
+          [attr.aria-label]="c"
+        ></button>
+      }
+      <label class="swatch custom" [class.selected]="theme.color() && !presets.includes(theme.color()!)"
+             [style.background]="theme.color() && !presets.includes(theme.color()!) ? theme.color() : null"
+             [attr.aria-label]="t('settings.themeCustom')">
+        <ion-icon name="color-palette-outline"></ion-icon>
+        <input type="color" [value]="theme.color() ?? '#2e7d32'" (input)="theme.set($any($event.target).value)" />
+      </label>
+    </div>
+    <p class="hint">{{ t('settings.themeHint') }}</p>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header>
       <ion-label>{{ t('settings.backup') }}</ion-label>
     </ion-list-header>
     <p class="hint">{{ t('settings.backupHint') }}</p>
@@ -60,5 +92,29 @@
       </ion-label>
       <ion-note slot="end">buycoffee.to</ion-note>
     </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header>
+      <ion-label>{{ t('settings.about') }}</ion-label>
+    </ion-list-header>
+    <ion-item lines="none">
+      <img slot="start" class="app-icon" src="assets/icon/favicon.png" alt="" />
+      <ion-label>
+        <h2>{{ info.name }}</h2>
+        <p>{{ t('settings.version', { version: info.version }) }} · {{ info.copyright }}</p>
+      </ion-label>
+    </ion-item>
+    <div class="about">
+      <h3>{{ t('settings.privacyTitle') }}</h3>
+      <p>{{ t('settings.privacyText') }}</p>
+      <h3>{{ t('settings.licensesTitle') }}</h3>
+      <p>{{ t('settings.licensesText') }}</p>
+      <ul>
+        @for (lib of info.licenses; track lib.name) {
+          <li>{{ lib.name }} – {{ lib.license }}</li>
+        }
+      </ul>
+    </div>
   </ion-list>
 </ion-content>

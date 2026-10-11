@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { Card, Folder, StudyMode } from '../models/card';
+import { Card, Folder, StudyMode, hasFamily, migrateCard } from '../models/card';
 
 const DB_NAME = 'plant-flashcards';
 // v1: cards. v2: folders. Bumping the version upgrades the existing database in place - cards are kept.
@@ -63,9 +63,14 @@ export class CardStore {
     const cards = tx.objectStore(CARDS).getAll();
     const folders = tx.objectStore(FOLDERS).getAll();
     await done(tx);
-    this._cards.set((cards.result as Card[]).sort(byPolishName));
+    const stored = cards.result as Card[];
+    const migrated = stored.map(migrateCard);
+    this._cards.set([...migrated].sort(byPolishName));
     this._folders.set((folders.result as Folder[]).sort(byName));
     this.loaded.set(true);
+    // Persist cards converted from an older format, so the migration runs only once.
+    const changed = migrated.filter((c, i) => c !== stored[i]);
+    if (changed.length) await this.saveMany(changed);
   }
 
   /**
@@ -77,7 +82,7 @@ export class CardStore {
     if (folderIds.length)
       cards = cards.filter((c) => folderIds.some((f) => inFolder(c, f)));
     if (mode === 'image') return cards.filter((c) => c.images.length > 0);
-    if (mode === 'family') return cards.filter((c) => !!c.family?.trim());
+    if (mode === 'family') return cards.filter(hasFamily);
     return cards;
   }
 
@@ -100,6 +105,22 @@ export class CardStore {
   async remove(id: string): Promise<void> {
     await this.write(CARDS, (s) => s.delete(id));
     this._cards.update((all) => all.filter((c) => c.id !== id));
+  }
+
+  /** Makes exactly `cardIds` the members of the folder: adds the folder to those cards and removes it from all others. */
+  async setFolderMembers(folderId: string, cardIds: Set<string>): Promise<void> {
+    const now = Date.now();
+    const changed: Card[] = [];
+    for (const card of this._cards()) {
+      const isIn = inFolder(card, folderId);
+      const shouldBe = cardIds.has(card.id);
+      if (isIn === shouldBe) continue;
+      const folderIds = shouldBe
+        ? [...(card.folderIds ?? []), folderId]
+        : card.folderIds!.filter((f) => f !== folderId);
+      changed.push({ ...card, folderIds, updatedAt: now });
+    }
+    if (changed.length) await this.saveMany(changed);
   }
 
   async saveFolders(folders: Folder[]): Promise<void> {

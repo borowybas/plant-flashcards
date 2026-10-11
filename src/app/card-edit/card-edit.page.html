@@ -37,11 +37,21 @@
     </ion-item>
     <ion-item>
       <ion-input
-        [label]="t('common.family')"
+        [label]="t('common.familyPl')"
         labelPlacement="stacked"
-        [placeholder]="t('edit.familyPlaceholder')"
+        [placeholder]="t('edit.familyPlPlaceholder')"
         autocapitalize="sentences"
-        [(ngModel)]="family"
+        [(ngModel)]="familyPl"
+      ></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input
+        class="latin"
+        [label]="t('common.familyLa')"
+        labelPlacement="stacked"
+        [placeholder]="t('edit.familyLaPlaceholder')"
+        autocapitalize="sentences"
+        [(ngModel)]="familyLa"
       ></ion-input>
     </ion-item>
   </ion-list>

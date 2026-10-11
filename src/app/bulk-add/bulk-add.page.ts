@@ -30,7 +30,8 @@ interface Draft {
   image: string;
   polish: string;
   latin: string;
-  family: string;
+  familyPl: string;
+  familyLa: string;
 }
 
 const isComplete = (d: Draft) => d.polish.trim() !== '' && d.latin.trim() !== '';
@@ -78,7 +79,7 @@ export class BulkAddPage {
       const urls = await filesToDataUrls(inputEl.files);
       this.drafts.update((d) => [
         ...d,
-        ...urls.map((image) => ({ key: this.nextKey++, image, polish: '', latin: '', family: '' })),
+        ...urls.map((image) => ({ key: this.nextKey++, image, polish: '', latin: '', familyPl: '', familyLa: '' })),
       ]);
     } finally {
       inputEl.value = '';
@@ -99,7 +100,8 @@ export class BulkAddPage {
         id: newId(),
         polish: d.polish.trim(),
         latin: d.latin.trim(),
-        family: d.family.trim(),
+        familyPl: d.familyPl.trim() || undefined,
+        familyLa: d.familyLa.trim() || undefined,
         folderIds: this.folderIds(),
         images: [d.image],
         createdAt: now,

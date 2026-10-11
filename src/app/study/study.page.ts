@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal, viewChild } from '@angular/core';
 import {
   IonBackButton,
   IonButton,
@@ -13,10 +13,11 @@ import {
   NavController,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { checkmark, close, imageOutline, refresh, repeat, trophyOutline } from 'ionicons/icons';
+import { arrowBack, arrowForward, imageOutline, refresh, repeat, trophyOutline } from 'ionicons/icons';
 import { Card, NameSide, StudyMode } from '../models/card';
 import { CardStore } from '../services/card-store.service';
 import { I18n } from '../services/i18n.service';
+import { SwipeCardDirective } from './swipe-card.directive';
 
 function shuffled<T>(items: T[]): T[] {
   const a = [...items];
@@ -33,19 +34,21 @@ const randomImage = (card: Card) => card.images[Math.floor(Math.random() * card.
   selector: 'app-study',
   templateUrl: 'study.page.html',
   styleUrls: ['study.page.scss'],
-  imports: [NgTemplateOutlet, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonProgressBar, IonContent, IonButton, IonIcon],
+  host: { '(document:keydown)': 'onKey($event)' },
+  imports: [SwipeCardDirective, NgTemplateOutlet, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonProgressBar, IonContent, IonButton, IonIcon],
 })
 export class StudyPage {
   private readonly store = inject(CardStore);
   private readonly nav = inject(NavController);
   readonly t = inject(I18n).t;
 
-  // Query params (bound via withComponentInputBinding).
-  readonly mode = input<StudyMode>('name');
-  readonly front = input<NameSide>('pl');
-  readonly shuffle = input<string>('1');
+  // Query params (bound via withComponentInputBinding). A missing param is bound as `undefined`,
+  // which would override a plain default – hence the transforms.
+  readonly mode = input('name' as StudyMode, { transform: (v: StudyMode | undefined) => v ?? 'name' });
+  readonly front = input('pl' as NameSide, { transform: (v: NameSide | undefined) => v ?? 'pl' });
+  readonly shuffle = input('1', { transform: (v: string | undefined) => v ?? '1' });
   /** Comma-separated folder ids; empty = all cards. */
-  readonly folders = input<string>('');
+  readonly folders = input('', { transform: (v: string | undefined) => v ?? '' });
 
   /** Cards still to answer; the head is the one on screen. Unknown cards go back to the end. */
   readonly queue = signal<Card[]>([]);
@@ -87,18 +90,20 @@ export class StudyPage {
       case 'image':
         return [pl, la];
       case 'family':
-        return [{ label: this.t('common.family'), text: card.family ?? '', latin: false }];
+        return [
+          { label: this.t('common.familyPl'), text: card.familyPl ?? '', latin: false },
+          { label: this.t('common.familyLa'), text: card.familyLa ?? '', latin: true },
+        ].filter((a) => a.text.trim());
       default:
         return this.front() === 'pl' ? [la] : [pl];
     }
   });
 
-  readonly prompt = computed(() =>
-    this.t(this.mode() === 'family' ? 'study.promptFamily' : 'study.promptName'),
-  );
+  /** Extra hint on the front – only the family mode needs one (the names alone don't say what is asked). */
+  readonly prompt = computed(() => (this.mode() === 'family' ? this.t('study.promptFamily') : ''));
 
   constructor() {
-    addIcons({ checkmark, close, imageOutline, refresh, repeat, trophyOutline });
+    addIcons({ arrowBack, arrowForward, imageOutline, refresh, repeat, trophyOutline });
     effect(() => {
       if (this.started || !this.store.loaded()) return;
       this.started = true;
@@ -115,8 +120,23 @@ export class StudyPage {
     this.showHead();
   }
 
+  private readonly swipeCard = viewChild(SwipeCardDirective);
+
   flip() {
     this.flipped.update((f) => !f);
+  }
+
+  /** Keyboard shortcuts (handy in the browser): ← don't know, → know, space/enter flips. */
+  onKey(e: KeyboardEvent) {
+    const swipe = this.swipeCard();
+    if (!swipe || !this.current()) return;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      swipe.flyOut(e.key === 'ArrowRight' ? 'right' : 'left');
+    } else if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      this.flip();
+    }
   }
 
   answer(known: boolean) {

@@ -7,3 +7,79 @@ ion-segment {
   font-size: 13px;
   color: var(--ion-color-medium);
 }
+
+.app-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.about {
+  padding: 0 16px 24px;
+  font-size: 13px;
+  color: var(--ion-color-medium);
+
+  h3 {
+    margin: 12px 0 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ion-text-color);
+  }
+
+  p,
+  ul {
+    margin: 0;
+  }
+
+  ul {
+    padding-left: 18px;
+  }
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 4px 16px 8px;
+}
+
+.swatch {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+
+  &.selected {
+    outline: 3px solid var(--ion-text-color, #000);
+    outline-offset: 3px;
+  }
+
+  // The default theme: green that adapts to dark mode – shown as a split swatch.
+  &.default {
+    background: linear-gradient(135deg, #2e7d32 50%, #66bb6a 50%);
+  }
+
+  &.custom {
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: conic-gradient(#f44336, #ffeb3b, #4caf50, #00bcd4, #3f51b5, #e91e63, #f44336);
+    color: #fff;
+    font-size: 20px;
+
+    ion-icon {
+      filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.8));
+    }
+
+    input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+  }
+}

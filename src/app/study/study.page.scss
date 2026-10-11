@@ -111,18 +111,60 @@
   }
 }
 
-.actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  visibility: hidden; // keep space reserved so the card doesn't jump
+.scene {
+  position: relative; // anchor for the stamps
+  touch-action: none; // the swipe gesture handles horizontal movement
+}
 
-  &.visible {
-    visibility: visible;
+// "WIEM" / "NIE WIEM" stamps fade in while the card is dragged (opacity driven by the swipe directive).
+.stamp {
+  position: absolute;
+  top: 24px;
+  z-index: 2;
+  padding: 6px 14px;
+  border: 4px solid currentColor;
+  border-radius: 10px;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+
+  &.know {
+    left: 20px;
+    color: var(--ion-color-success);
+    transform: rotate(-14deg);
+    opacity: var(--know, 0);
   }
 
-  ion-button {
-    margin: 0;
+  &.dont-know {
+    right: 20px;
+    color: var(--ion-color-danger);
+    transform: rotate(14deg);
+    opacity: var(--dont-know, 0);
+  }
+}
+
+.swipe-hint {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dont-know {
+    color: var(--ion-color-danger);
+  }
+
+  .know {
+    color: var(--ion-color-success);
   }
 }
 

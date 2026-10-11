@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
   ActionSheetController,
+  ModalController,
   AlertController,
   IonChip,
   IonBadge,
@@ -24,8 +25,18 @@ import {
   IonToolbar,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { add, createOutline, ellipsisVertical, folderOutline, imageOutline, imagesOutline, trashOutline } from 'ionicons/icons';
+import {
+  add,
+  checkboxOutline,
+  createOutline,
+  ellipsisVertical,
+  folderOutline,
+  imageOutline,
+  imagesOutline,
+  trashOutline,
+} from 'ionicons/icons';
 import { Card } from '../models/card';
+import { AssignCardsModal } from './assign-cards.modal';
 import { CardStore, inFolder } from '../services/card-store.service';
 import { FolderDialogs } from '../services/folder-dialogs.service';
 import { I18n } from '../services/i18n.service';
@@ -45,6 +56,7 @@ export class CardsPage {
   readonly store = inject(CardStore);
   private readonly alerts = inject(AlertController);
   private readonly actionSheets = inject(ActionSheetController);
+  private readonly modals = inject(ModalController);
   private readonly folderDialogs = inject(FolderDialogs);
   readonly t = inject(I18n).t;
 
@@ -68,12 +80,13 @@ export class CardsPage {
     if (!q) return cards;
     return cards.filter(
       (c) => c.polish.toLocaleLowerCase('pl').includes(q) || c.latin.toLocaleLowerCase().includes(q) ||
-        !!c.family?.toLocaleLowerCase('pl').includes(q),
+        !!c.familyPl?.toLocaleLowerCase('pl').includes(q) ||
+        !!c.familyLa?.toLocaleLowerCase().includes(q),
     );
   });
 
   constructor() {
-    addIcons({ add, createOutline, ellipsisVertical, folderOutline, imageOutline, imagesOutline, trashOutline });
+    addIcons({ add, checkboxOutline, createOutline, ellipsisVertical, folderOutline, imageOutline, imagesOutline, trashOutline });
   }
 
   async confirmRemove(card: Card, sliding?: IonItemSliding) {
@@ -94,12 +107,24 @@ export class CardsPage {
     if (folder) this.folderId.set(folder.id);
   }
 
+  /** Opens the checklist for adding existing cards to (or removing them from) the open folder. */
+  async assignCards() {
+    const folder = this.folder();
+    if (!folder) return;
+    const modal = await this.modals.create({
+      component: AssignCardsModal,
+      componentProps: { folderId: folder.id, folderName: folder.name },
+    });
+    await modal.present();
+  }
+
   async folderActions() {
     const folder = this.folder();
     if (!folder) return;
     const sheet = await this.actionSheets.create({
       header: folder.name,
       buttons: [
+        { text: this.t('assign.title'), icon: 'checkbox-outline', handler: () => this.assignCards() },
         { text: this.t('cards.rename'), icon: 'create-outline', handler: () => this.folderDialogs.rename(folder) },
         {
           text: this.t('cards.deleteFolder'),
